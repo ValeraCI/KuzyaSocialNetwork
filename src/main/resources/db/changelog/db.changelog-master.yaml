@@ -1,0 +1,545 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1-13.04.2023-family_statuses
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: varchar(50)
+                  constraints:
+                    unique:  true
+                    nullable: false
+        - createIndex:
+            indexName: idx_id_family_statuses
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: id
+            clustered: true
+
+  - changeSet:
+      id: 2-13.04.2023-users
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: last_name
+                  type: varchar(60)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(60)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: family_status_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            columnDataType: boolean
+            columnName: is_active
+            defaultValueBoolean: true
+            tableName: users
+        - addForeignKeyConstraint:
+            constraintName: users_family_status_id_fk
+            baseTableName: users
+            baseColumnNames: family_status_id
+            referencedTableName: family_statuses
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            indexName: idx_id_users
+            tableName: users
+            columns:
+              - column:
+                  name: id
+            clustered:  true
+        - createIndex:
+            indexName: idx_last_name_users
+            tableName: users
+            columns:
+              - column:
+                  name: last_name
+        - createIndex:
+            indexName: idx_first_name_users
+            tableName: users
+            columns:
+              - column:
+                  name: first_name
+
+  - changeSet:
+      id: 3-13.04.2023-roles
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: varchar(40)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createIndex:
+            indexName: idx_id_roles
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+            clustered: true
+
+  - changeSet:
+      id: 4-13.04.2023-users_roles
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: role_id
+                  type: int
+        - addPrimaryKey:
+            columnNames: user_id, role_id
+            constraintName: pk_users_roles
+            tableName: users_roles
+        - addForeignKeyConstraint:
+            constraintName: users_roles_user_id_fk
+            baseTableName: users_roles
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: users_roles_role_id_fk
+            baseTableName: users_roles
+            baseColumnNames: role_id
+            referencedTableName: roles
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            indexName: idx_user_id_role_id_users_roles
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: role_id
+            clustered: true
+
+  - changeSet:
+      id: 5-14.04.2023-users_credentials
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: users_credentials
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: login
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: users_credentials_user_id_fk
+            baseTableName: users_credentials
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_user_id_users_credentials
+            tableName: users_credentials
+            columns:
+              - column:
+                  name: user_id
+            clustered: true
+        - createIndex:
+            indexName: idx_login_users_credentials
+            tableName: users_credentials
+            columns:
+              - column:
+                  name: login
+
+  - changeSet:
+      id: 6-14.04.2023-locks
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: locks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: beginning
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: days
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reason
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: locks_user_id_fk
+            baseTableName: locks
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_id_locks
+            tableName: locks
+            columns:
+              - column:
+                  name: id
+            clustered: true
+        - createIndex:
+            indexName: idx_user_id_locks
+            tableName: locks
+            columns:
+              - column:
+                  name: user_id
+
+  - changeSet:
+      id: 7-14.04.2023-file_types
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: file_types
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createIndex:
+            indexName: idx_id_file_types
+            tableName: file_types
+            columns:
+              - column:
+                  name: id
+
+  - changeSet:
+      id: 8-14.04.2023-media_files
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: media_files
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: path
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: file_type_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            columnDataType: boolean
+            columnName: is_active
+            defaultValueBoolean: true
+            tableName: media_files
+        - addForeignKeyConstraint:
+            constraintName: media_files_file_type_id_fk
+            baseTableName: media_files
+            baseColumnNames: file_type_id
+            referencedTableName: file_types
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_id_media_files
+            tableName: media_files
+            columns:
+              - column:
+                  name: id
+
+  - changeSet:
+      id: 9-14.04.2023-users_media_files
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: users_media_files
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: media_file_id
+                  type: bigint
+        - addPrimaryKey:
+            columnNames: user_id, media_file_id
+            constraintName: pk_users_media_files
+            tableName: users_media_files
+        - addForeignKeyConstraint:
+            constraintName: users_media_files_user_id_fk
+            baseTableName: users_media_files
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: users_media_files_media_file_id_fk
+            baseTableName: users_media_files
+            baseColumnNames: media_file_id
+            referencedTableName: media_files
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_user_id_media_file_id_users_media_files
+            tableName: users_media_files
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: media_file_id
+            clustered: true
+
+  - changeSet:
+      id: 10-14.04.2023-posts
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: posts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            columnDataType: datetime
+            columnName: date
+            defaultValueComputed: CURRENT_TIMESTAMP
+            tableName: posts
+        - addDefaultValue:
+            columnDataType: boolean
+            columnName: is_active
+            defaultValueBoolean: true
+            tableName: posts
+        - addForeignKeyConstraint:
+            constraintName: users_family_status_id_fk
+            baseTableName: posts
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_id_posts
+            tableName: posts
+            columns:
+              - column:
+                  name: id
+            clustered: true
+        - createIndex:
+            indexName: idx_title_posts
+            tableName: posts
+            columns:
+              - column:
+                  name: title
+
+  - changeSet:
+      id: 11-14.04.2023-posts_media_files
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: posts_media_files
+            columns:
+              - column:
+                  name: post_id
+                  type: bigint
+              - column:
+                  name: media_file_id
+                  type: bigint
+        - addPrimaryKey:
+            columnNames: post_id, media_file_id
+            constraintName: pk_posts_media_files
+            tableName: posts_media_files
+        - addForeignKeyConstraint:
+            constraintName: posts_media_files_post_id_fk
+            baseTableName: posts_media_files
+            baseColumnNames: post_id
+            referencedTableName: posts
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: posts_media_files_media_file_id_fk
+            baseTableName: posts_media_files
+            baseColumnNames: media_file_id
+            referencedTableName: media_files
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_post_id_media_file_id_posts_media_files
+            tableName: posts_media_files
+            columns:
+              - column:
+                  name: post_id
+              - column:
+                  name: media_file_id
+            clustered: true
+
+  - changeSet:
+      id: 12-14.04.2023-comments
+      author: Cidik Valera
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: post_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - addDefaultValue:
+            columnDataType: datetime
+            columnName: date
+            defaultValueComputed: CURRENT_TIMESTAMP
+            tableName: comments
+        - addDefaultValue:
+            columnDataType: boolean
+            columnName: is_active
+            defaultValueBoolean: true
+            tableName: comments
+        - addForeignKeyConstraint:
+            constraintName: users_family_status_id_fk
+            baseTableName: comments
+            baseColumnNames: post_id
+            referencedTableName: posts
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - createIndex:
+            indexName: idx_id_comments
+            tableName: posts
+            columns:
+              - column:
+                  name: id
+            clustered: true

@@ -1,0 +1,20 @@
+# Gradle files
+.gradle/
+/build/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Spring Boot files
+/target/
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
