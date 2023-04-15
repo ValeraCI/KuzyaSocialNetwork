@@ -16,7 +16,7 @@ databaseChangeLog:
                   name: title
                   type: varchar(50)
                   constraints:
-                    unique:  true
+                    unique: true
                     nullable: false
         - createIndex:
             indexName: idx_id_family_statuses
@@ -77,7 +77,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-            clustered:  true
+            clustered: true
         - createIndex:
             indexName: idx_last_name_users
             tableName: users
@@ -273,6 +273,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: int
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
               - column:
@@ -298,6 +299,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: int
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
               - column:
@@ -543,3 +545,84 @@ databaseChangeLog:
               - column:
                   name: id
             clustered: true
+
+  - changeSet:
+      id: 13-15.04.2023-insert-family_statuses
+      author: Cidik Valera
+      changes:
+        - insert:
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: title
+                  value: SINGLE
+        - insert:
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: title
+                  value: MARRIED
+        - insert:
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: title
+                  value: IN_A_RELATIONSHIP
+        - insert:
+            tableName: family_statuses
+            columns:
+              - column:
+                  name: title
+                  value: COMPLICATED
+
+  - changeSet:
+      id: 14-15.04.2023-insert-roles
+      author: Cidik Valera
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: title
+                  value: ROLE_OWNER
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: title
+                  value: ROLE_ADMINISTRATOR
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: title
+                  value: ROLE_USER
+
+  - changeSet:
+      id: 15-15.04.2023-insert-file_types
+      author: Cidik Valera
+      changes:
+        - insert:
+            tableName: file_types
+            columns:
+              - column:
+                  name: type
+                  value: JPEG
+        - insert:
+            tableName: file_types
+            columns:
+              - column:
+                  name: type
+                  value: PNG
+        - insert:
+            tableName: file_types
+            columns:
+              - column:
+                  name: type
+                  value: GIF
+        - insert:
+            tableName: file_types
+            columns:
+              - column:
+                  name: type
+                  value: MP4
