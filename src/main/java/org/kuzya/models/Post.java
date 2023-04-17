@@ -2,6 +2,7 @@ package org.kuzya.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -25,9 +26,10 @@ public class Post extends BaseActiveEntity<Long> {
     private String title;
     @Column(name = "text")
     private String text;
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post",
+            fetch = FetchType.EAGER)
     private Set<Comment> comments;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "posts_media_files",
             joinColumns = @JoinColumn(name = "post_id"),

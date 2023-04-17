@@ -35,7 +35,7 @@ public class User extends BaseActiveEntity<Long> {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_media_files",
             joinColumns = @JoinColumn(name = "user_id"),

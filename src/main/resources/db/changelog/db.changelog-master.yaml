@@ -128,9 +128,13 @@ databaseChangeLog:
               - column:
                   name: user_id
                   type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: role_id
                   type: int
+                  constraints:
+                    nullable: false
         - addPrimaryKey:
             columnNames: user_id, role_id
             constraintName: pk_users_roles
@@ -347,9 +351,13 @@ databaseChangeLog:
               - column:
                   name: user_id
                   type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: media_file_id
                   type: bigint
+                  constraints:
+                    nullable: false
         - addPrimaryKey:
             columnNames: user_id, media_file_id
             constraintName: pk_users_media_files
@@ -427,7 +435,7 @@ databaseChangeLog:
             defaultValueBoolean: true
             tableName: posts
         - addForeignKeyConstraint:
-            constraintName: users_family_status_id_fk
+            constraintName: posts_user_id_fk
             baseTableName: posts
             baseColumnNames: user_id
             referencedTableName: users
@@ -457,9 +465,13 @@ databaseChangeLog:
               - column:
                   name: post_id
                   type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: media_file_id
                   type: bigint
+                  constraints:
+                    nullable: false
         - addPrimaryKey:
             columnNames: post_id, media_file_id
             constraintName: pk_posts_media_files
@@ -532,7 +544,7 @@ databaseChangeLog:
             defaultValueBoolean: true
             tableName: comments
         - addForeignKeyConstraint:
-            constraintName: users_family_status_id_fk
+            constraintName: comments_post_id_fk
             baseTableName: comments
             baseColumnNames: post_id
             referencedTableName: posts
