@@ -39,7 +39,7 @@ public class UserControllerTest {
     @Test
     public void registerFail() throws Exception {
         RegistrationDto registrationDto =
-                ObjectCreator.createRegistrationDto("test@gmail.com", "1234",
+                ObjectCreator.createRegistrationDto("test@gmail.com", "123456",
                         "lastname", "firstname", FamilyStatusTitle.SINGLE);
 
         mockMvc.perform(post("/users")
@@ -68,7 +68,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDto)))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
 }

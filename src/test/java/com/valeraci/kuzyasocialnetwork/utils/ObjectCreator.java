@@ -177,10 +177,10 @@ public class ObjectCreator {
 
     public static RegistrationDto createRegistrationDto(){
         RegistrationDto registrationDto = new RegistrationDto();
-        registrationDto.setEmail("email");
-        registrationDto.setPassword("pass");
-        registrationDto.setLastName("ln");
-        registrationDto.setFirstName("fn");
+        registrationDto.setEmail("email@gmail.com");
+        registrationDto.setPassword("passsssss");
+        registrationDto.setLastName("lntest");
+        registrationDto.setFirstName("fntest");
         registrationDto.setFamilyStatusTitle(FamilyStatusTitle.SINGLE);
 
         return registrationDto;
