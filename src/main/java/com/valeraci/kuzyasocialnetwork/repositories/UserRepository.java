@@ -10,11 +10,6 @@ import java.util.Set;
 
 @Repository
 public interface UserRepository extends org.springframework.data.repository.Repository<User, Long> {
-
-    User save(User entity);
-
-    Set<User> saveAll(Iterable<User> entities);
-
     @Query("SELECT u FROM User u JOIN FETCH u.familyStatus WHERE u.id = :id AND u.isActive")
     Optional<User> findById(Long id);
 

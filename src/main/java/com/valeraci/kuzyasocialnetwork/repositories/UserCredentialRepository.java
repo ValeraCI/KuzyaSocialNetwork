@@ -21,4 +21,7 @@ public interface UserCredentialRepository extends org.springframework.data.repos
 
     @Query("SELECT uc FROM UserCredential uc JOIN uc.user u WHERE uc.id IN :ids AND u.isActive")
     Set<UserCredential> findAllById(Iterable<Long> ids);
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM UserCredential u WHERE u.email = :email")
+    boolean existsByEmail(String email);
 }

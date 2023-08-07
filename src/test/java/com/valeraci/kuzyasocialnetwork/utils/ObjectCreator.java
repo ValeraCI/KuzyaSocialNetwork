@@ -1,5 +1,6 @@
-package utils;
+package com.valeraci.kuzyasocialnetwork.utils;
 
+import com.valeraci.kuzyasocialnetwork.dto.users.RegistrationDto;
 import com.valeraci.kuzyasocialnetwork.models.Comment;
 import com.valeraci.kuzyasocialnetwork.models.FamilyStatus;
 import com.valeraci.kuzyasocialnetwork.models.FileType;
@@ -11,16 +12,20 @@ import com.valeraci.kuzyasocialnetwork.models.UserCredential;
 import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
 import com.valeraci.kuzyasocialnetwork.models.enums.FileTypeTitle;
 import com.valeraci.kuzyasocialnetwork.models.enums.RoleTitle;
+import com.valeraci.kuzyasocialnetwork.util.factories.SimpleFamilyStatusFactory;
+import com.valeraci.kuzyasocialnetwork.util.factories.SimpleRoleFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ObjectCreator {
+    public static final SimpleFamilyStatusFactory simpleFamilyStatusFactory = new SimpleFamilyStatusFactory();
+    public static final SimpleRoleFactory simpleRoleFactory = new SimpleRoleFactory();
 
     public static User createUser() {
         User user = new User();
 
-        FamilyStatus familyStatus = createFamilyStatus(FamilyStatusTitle.SINGLE);
+        FamilyStatus familyStatus = simpleFamilyStatusFactory.createFamilyStatus(FamilyStatusTitle.SINGLE);
 
         user.setFamilyStatus(familyStatus);
         user.setLastName("Tester");
@@ -33,7 +38,7 @@ public class ObjectCreator {
                                   FamilyStatusTitle familyStatusTitle) {
         User user = new User();
 
-        FamilyStatus familyStatus = createFamilyStatus(familyStatusTitle);
+        FamilyStatus familyStatus = simpleFamilyStatusFactory.createFamilyStatus(familyStatusTitle);
 
         user.setFamilyStatus(familyStatus);
         user.setLastName(lastName);
@@ -47,7 +52,7 @@ public class ObjectCreator {
         userCredential.setEmail("TestEmail");
         userCredential.setPassword("TestPassword");
 
-        Role role = createRole(RoleTitle.ROLE_USER);
+        Role role = simpleRoleFactory.createRole(RoleTitle.ROLE_USER);
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(role);
 
@@ -67,7 +72,7 @@ public class ObjectCreator {
         userCredential.setEmail(email);
         userCredential.setPassword(password);
 
-        Role role = createRole(RoleTitle.ROLE_USER);
+        Role role = simpleRoleFactory.createRole(RoleTitle.ROLE_USER);
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(role);
 
@@ -78,33 +83,6 @@ public class ObjectCreator {
         userCredential.setUser(user);
 
         return userCredential;
-    }
-
-    public static FamilyStatus createFamilyStatus(FamilyStatusTitle familyStatusTitle) {
-        FamilyStatus familyStatus = new FamilyStatus();
-
-        switch (familyStatusTitle) {
-            case SINGLE -> familyStatus.setId(1);
-            case MARRIED -> familyStatus.setId(2);
-            case IN_A_RELATIONSHIP -> familyStatus.setId(3);
-            case COMPLICATED -> familyStatus.setId(4);
-        }
-
-        familyStatus.setTitle(familyStatusTitle);
-        return familyStatus;
-    }
-
-    public static Role createRole(RoleTitle roleTitle) {
-        Role role = new Role();
-
-        switch (roleTitle) {
-            case ROLE_OWNER -> role.setId(1);
-            case ROLE_ADMINISTRATOR -> role.setId(2);
-            case ROLE_USER -> role.setId(3);
-        }
-
-        role.setTitle(roleTitle);
-        return role;
     }
 
     public static Post createPost(User user) {
@@ -195,5 +173,29 @@ public class ObjectCreator {
         comment.setCommentator(commentator);
 
         return comment;
+    }
+
+    public static RegistrationDto createRegistrationDto(){
+        RegistrationDto registrationDto = new RegistrationDto();
+        registrationDto.setEmail("email");
+        registrationDto.setPassword("pass");
+        registrationDto.setLastName("ln");
+        registrationDto.setFirstName("fn");
+        registrationDto.setFamilyStatusTitle(FamilyStatusTitle.SINGLE);
+
+        return registrationDto;
+    }
+
+    public static RegistrationDto createRegistrationDto(String email, String password,
+                                                        String lastName, String firstName,
+                                                        FamilyStatusTitle familyStatus){
+        RegistrationDto registrationDto = new RegistrationDto();
+        registrationDto.setEmail(email);
+        registrationDto.setPassword(password);
+        registrationDto.setLastName(lastName);
+        registrationDto.setFirstName(firstName);
+        registrationDto.setFamilyStatusTitle(familyStatus);
+
+        return registrationDto;
     }
 }

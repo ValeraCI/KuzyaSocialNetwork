@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import utils.ObjectCreator;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -207,5 +207,19 @@ public class UserCredentialRepositoryTest {
         Set<UserCredential> readUserCredentialSet = userCredentialRepository.findAllById(Collections.singletonList(1L));
 
         Assertions.assertEquals(0, readUserCredentialSet.size());
+    }
+
+    @Test
+    public void existsByEmailTest(){
+        UserCredential userCredential = ObjectCreator.createUserCredential();
+        Assertions.assertNull(userCredential.getId());
+
+        Assertions.assertFalse(userCredentialRepository.existsByEmail(userCredential.getEmail()));
+
+        entityManager.persist(userCredential);
+        entityManager.flush();
+        entityManager.detach(userCredential);
+
+        Assertions.assertTrue(userCredentialRepository.existsByEmail(userCredential.getEmail()));
     }
 }
