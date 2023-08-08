@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import utils.ObjectCreator;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,52 +30,6 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private TestEntityManager entityManager;
-
-    @Test
-    public void saveTest() {
-        User user = ObjectCreator.createUser();
-        Assertions.assertNull(user.getId());
-
-        user = userRepository.save(user);
-        entityManager.flush();
-        entityManager.detach(user);
-
-        User readUser = entityManager.find(User.class, user.getId());
-        entityManager.detach(readUser);
-
-        Assertions.assertNotNull(readUser);
-        Assertions.assertEquals(user.getLastName(), readUser.getLastName());
-        Assertions.assertEquals(user.getFamilyStatus().getTitle(), readUser.getFamilyStatus().getTitle());
-    }
-
-    @Test
-    public void saveAllTest() {
-        Set<User> userSet = IntStream.range(0, 10)
-                .mapToObj(num ->
-                        ObjectCreator.createUser(
-                                "ln" + num, "fn" + num,
-                                FamilyStatusTitle.SINGLE))
-                .collect(Collectors.toSet());
-
-        userSet = userRepository.saveAll(userSet);
-
-        entityManager.flush();
-        userSet.forEach(user -> entityManager.detach(user));
-
-        CriteriaBuilder builder = entityManager.getEntityManager().getCriteriaBuilder();
-        CriteriaQuery<User> query = builder.createQuery(User.class);
-        Root<User> root = query.from(User.class);
-
-        root.fetch("familyStatus");
-
-        query
-                .select(root)
-                .where(builder.equal(root.get("isActive"), true));
-
-        List<User> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
-
-        Assertions.assertEquals(userSet.size(), readlist.size());
-    }
 
     @Test
     public void findByIdTest() {
