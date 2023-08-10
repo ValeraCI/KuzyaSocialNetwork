@@ -12,9 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +26,8 @@ public class UserCredentialServiceImplTest {
     private UserCredentialRepository userCredentialRepository;
     @Mock
     private UserCredentialMapper userCredentialMapper;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserCredentialServiceImpl userCredentialService;
 
@@ -32,11 +36,14 @@ public class UserCredentialServiceImplTest {
         RegistrationDto registrationDto = ObjectCreator.createRegistrationDto();
         UserCredential userCredential = ObjectCreator.createUserCredential();
         when(userCredentialRepository.existsByEmail(registrationDto.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registrationDto.getPassword())).thenReturn("new encoded password");
         when(userCredentialMapper.toEntity(registrationDto)).thenReturn(userCredential);
         when(userCredentialRepository.save(userCredential)).thenReturn(userCredential);
 
         userCredentialService.register(registrationDto);
 
+        verify(userCredentialRepository).existsByEmail(anyString());
+        verify(passwordEncoder).encode(anyString());
         verify(userCredentialMapper).toEntity(registrationDto);
         verify(userCredentialRepository).save(userCredential);
     }

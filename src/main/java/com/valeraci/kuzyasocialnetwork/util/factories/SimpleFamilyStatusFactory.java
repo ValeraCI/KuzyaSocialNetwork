@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SimpleFamilyStatusFactory {
-    public FamilyStatus createFamilyStatus(FamilyStatusTitle title){
+    public FamilyStatus createFamilyStatus(FamilyStatusTitle title) {
         FamilyStatus familyStatus = new FamilyStatus();
         familyStatus.setTitle(title);
 

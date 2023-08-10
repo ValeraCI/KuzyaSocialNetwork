@@ -42,7 +42,7 @@ public class RestResponseEntityExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception
-    ){
+    ) {
         List<String> errors = exception.getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -59,7 +59,7 @@ public class RestResponseEntityExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException exception
-    ){
+    ) {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("error", exception.getMessage());
         return ResponseEntity

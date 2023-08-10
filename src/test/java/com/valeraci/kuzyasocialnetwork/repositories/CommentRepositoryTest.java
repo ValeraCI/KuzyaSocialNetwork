@@ -5,10 +5,10 @@ import com.valeraci.kuzyasocialnetwork.models.Post;
 import com.valeraci.kuzyasocialnetwork.models.User;
 import com.valeraci.kuzyasocialnetwork.models.baseEntity.IdEntity;
 import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +16,18 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("repositoryTest")
@@ -48,7 +53,7 @@ public class CommentRepositoryTest {
     @Test
     public void saveTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         comment = commentRepository.save(comment);
         entityManager.flush();
@@ -56,9 +61,9 @@ public class CommentRepositoryTest {
 
         Comment readComment = entityManager.find(Comment.class, comment.getId());
 
-        Assertions.assertNotNull(readComment);
-        Assertions.assertEquals(comment.getText(), readComment.getText());
-        Assertions.assertEquals(comment.getCommentator().getFamilyStatus(),
+        assertNotNull(readComment);
+        assertEquals(comment.getText(), readComment.getText());
+        assertEquals(comment.getCommentator().getFamilyStatus(),
                 comment.getCommentator().getFamilyStatus());
     }
 
@@ -86,13 +91,13 @@ public class CommentRepositoryTest {
 
         List<Comment> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        Assertions.assertEquals(commentSet.size(), readlist.size());
+        assertEquals(commentSet.size(), readlist.size());
     }
 
     @Test
     public void findByIdTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persistAndFlush(comment);
         entityManager.detach(comment);
@@ -100,10 +105,10 @@ public class CommentRepositoryTest {
         Comment readComment = commentRepository.findById(comment.getId()).orElse(null);
         entityManager.detach(readComment);
 
-        Assertions.assertNotNull(readComment);
-        Assertions.assertEquals(comment.getText(), readComment.getText());
-        Assertions.assertTrue(readComment.isActive());
-        Assertions.assertEquals(FamilyStatusTitle.SINGLE,
+        assertNotNull(readComment);
+        assertEquals(comment.getText(), readComment.getText());
+        assertTrue(readComment.isActive());
+        assertEquals(FamilyStatusTitle.SINGLE,
                 readComment.getCommentator().getFamilyStatus().getTitle());
     }
 
@@ -111,7 +116,7 @@ public class CommentRepositoryTest {
     public void findByIdFailTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
         comment.setActive(false);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persist(comment);
         entityManager.flush();
@@ -119,7 +124,7 @@ public class CommentRepositoryTest {
 
         Comment readComment = commentRepository.findById(comment.getId()).orElse(null);
 
-        Assertions.assertNull(readComment);
+        assertNull(readComment);
     }
 
     @Test
@@ -137,10 +142,10 @@ public class CommentRepositoryTest {
 
         readCommentSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(commentSet.size(), readCommentSet.size());
-        readCommentSet.forEach(comment -> Assertions.assertTrue(comment.isActive()));
+        assertEquals(commentSet.size(), readCommentSet.size());
+        readCommentSet.forEach(comment -> assertTrue(comment.isActive()));
         readCommentSet
-                .forEach(comment -> Assertions.assertEquals(FamilyStatusTitle.SINGLE,
+                .forEach(comment -> assertEquals(FamilyStatusTitle.SINGLE,
                         comment.getCommentator().getFamilyStatus().getTitle()));
     }
 
@@ -148,7 +153,7 @@ public class CommentRepositoryTest {
     public void findAllFailTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
         comment.setActive(false);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persist(comment);
         entityManager.flush();
@@ -156,7 +161,7 @@ public class CommentRepositoryTest {
 
         Set<Comment> readCommentSet = commentRepository.findAll();
 
-        Assertions.assertEquals(0, readCommentSet.size());
+        assertEquals(0, readCommentSet.size());
     }
 
     @Test
@@ -180,10 +185,10 @@ public class CommentRepositoryTest {
 
         readCommentSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(commentSet.size(), readCommentSet.size());
-        readCommentSet.forEach(comment -> Assertions.assertTrue(comment.isActive()));
+        assertEquals(commentSet.size(), readCommentSet.size());
+        readCommentSet.forEach(comment -> assertTrue(comment.isActive()));
         readCommentSet
-                .forEach(comment -> Assertions.assertEquals(FamilyStatusTitle.SINGLE,
+                .forEach(comment -> assertEquals(FamilyStatusTitle.SINGLE,
                         comment.getCommentator().getFamilyStatus().getTitle()));
     }
 
@@ -191,7 +196,7 @@ public class CommentRepositoryTest {
     public void findAllByIdFailTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
         comment.setActive(false);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persist(comment);
         entityManager.flush();
@@ -199,13 +204,13 @@ public class CommentRepositoryTest {
 
         Set<Comment> readCommentSet = commentRepository.findAllById(Collections.singletonList(1L));
 
-        Assertions.assertEquals(0, readCommentSet.size());
+        assertEquals(0, readCommentSet.size());
     }
 
     @Test
     public void deleteByIdTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persistAndFlush(comment);
         entityManager.detach(comment);
@@ -214,13 +219,13 @@ public class CommentRepositoryTest {
 
         Comment readComment = entityManager.find(Comment.class, comment.getId());
 
-        Assertions.assertFalse(readComment.isActive());
+        assertFalse(readComment.isActive());
     }
 
     @Test
     public void deleteTest() {
         Comment comment = ObjectCreator.createComment(post, commentator);
-        Assertions.assertNull(comment.getId());
+        assertNull(comment.getId());
 
         entityManager.persistAndFlush(comment);
         entityManager.detach(comment);
@@ -229,7 +234,7 @@ public class CommentRepositoryTest {
 
         Comment readComment = entityManager.find(Comment.class, comment.getId());
 
-        Assertions.assertFalse(readComment.isActive());
+        assertFalse(readComment.isActive());
     }
 
     @Test
@@ -261,6 +266,6 @@ public class CommentRepositoryTest {
 
         List<Comment> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        readlist.forEach(comment -> Assertions.assertFalse(comment.isActive()));
+        readlist.forEach(comment -> assertFalse(comment.isActive()));
     }
 }

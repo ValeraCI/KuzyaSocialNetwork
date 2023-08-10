@@ -2,24 +2,30 @@ package com.valeraci.kuzyasocialnetwork.repositories;
 
 import com.valeraci.kuzyasocialnetwork.models.UserCredential;
 import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("repositoryTest")
@@ -33,7 +39,7 @@ public class UserCredentialRepositoryTest {
     @Test
     public void saveTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
         userCredential = userCredentialRepository.save(userCredential);
         entityManager.flush();
@@ -43,9 +49,9 @@ public class UserCredentialRepositoryTest {
 
         entityManager.detach(readUserCredential);
 
-        Assertions.assertNotNull(readUserCredential);
-        Assertions.assertEquals(userCredential.getEmail(), readUserCredential.getEmail());
-        Assertions.assertEquals(userCredential.getUser().getLastName(), readUserCredential.getUser().getLastName());
+        assertNotNull(readUserCredential);
+        assertEquals(userCredential.getEmail(), readUserCredential.getEmail());
+        assertEquals(userCredential.getUser().getLastName(), readUserCredential.getUser().getLastName());
     }
 
     @Test
@@ -69,7 +75,7 @@ public class UserCredentialRepositoryTest {
 
         List<UserCredential> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        Assertions.assertEquals(userCredentialSet.size(), readlist.size());
+        assertEquals(userCredentialSet.size(), readlist.size());
     }
 
     @Test
@@ -87,13 +93,13 @@ public class UserCredentialRepositoryTest {
         userCredential =
                 entityManager.find(UserCredential.class, userCredential.getId());
 
-        Assertions.assertEquals("Tester", userCredential.getUser().getLastName());
+        assertEquals("Tester", userCredential.getUser().getLastName());
     }
 
     @Test
     public void findByIdTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
         entityManager.persist(userCredential);
         entityManager.flush();
@@ -103,9 +109,9 @@ public class UserCredentialRepositoryTest {
                 userCredentialRepository.findById(userCredential.getId()).orElse(null);
         entityManager.detach(readUserCredential);
 
-        Assertions.assertNotNull(readUserCredential);
-        Assertions.assertEquals(userCredential.getEmail(), readUserCredential.getEmail());
-        Assertions.assertEquals(userCredential.getUser().getFamilyStatus(),
+        assertNotNull(readUserCredential);
+        assertEquals(userCredential.getEmail(), readUserCredential.getEmail());
+        assertEquals(userCredential.getUser().getFamilyStatus(),
                 readUserCredential.getUser().getFamilyStatus());
     }
 
@@ -113,7 +119,7 @@ public class UserCredentialRepositoryTest {
     public void findByIdFailTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
         userCredential.getUser().setActive(false);
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
         entityManager.persist(userCredential);
         entityManager.flush();
@@ -122,7 +128,7 @@ public class UserCredentialRepositoryTest {
         UserCredential readUserCredential =
                 userCredentialRepository.findById(userCredential.getId()).orElse(null);
 
-        Assertions.assertNull(readUserCredential);
+        assertNull(readUserCredential);
     }
 
     @Test
@@ -142,11 +148,11 @@ public class UserCredentialRepositoryTest {
 
         readUserCredentialSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(userCredentialSet.size(), readUserCredentialSet.size());
+        assertEquals(userCredentialSet.size(), readUserCredentialSet.size());
         readUserCredentialSet
-                .forEach(userCredential -> Assertions.assertTrue(userCredential.getUser().isActive()));
+                .forEach(userCredential -> assertTrue(userCredential.getUser().isActive()));
         readUserCredentialSet
-                .forEach(userCredential -> Assertions.assertEquals(FamilyStatusTitle.SINGLE,
+                .forEach(userCredential -> assertEquals(FamilyStatusTitle.SINGLE,
                         userCredential.getUser().getFamilyStatus().getTitle()));
     }
 
@@ -154,7 +160,7 @@ public class UserCredentialRepositoryTest {
     public void findAllFailTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
         userCredential.getUser().setActive(false);
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
         entityManager.persist(userCredential);
         entityManager.flush();
@@ -162,7 +168,7 @@ public class UserCredentialRepositoryTest {
 
         Set<UserCredential> readUserCredentialSet = userCredentialRepository.findAll();
 
-        Assertions.assertEquals(0, readUserCredentialSet.size());
+        assertEquals(0, readUserCredentialSet.size());
     }
 
     @Test
@@ -187,10 +193,10 @@ public class UserCredentialRepositoryTest {
 
         readUserSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(userCredentialSet.size(), readUserSet.size());
-        readUserSet.forEach(userCredential -> Assertions.assertTrue(userCredential.getUser().isActive()));
+        assertEquals(userCredentialSet.size(), readUserSet.size());
+        readUserSet.forEach(userCredential -> assertTrue(userCredential.getUser().isActive()));
         readUserSet
-                .forEach(userCredential -> Assertions.assertEquals(FamilyStatusTitle.SINGLE,
+                .forEach(userCredential -> assertEquals(FamilyStatusTitle.SINGLE,
                         userCredential.getUser().getFamilyStatus().getTitle()));
     }
 
@@ -198,7 +204,7 @@ public class UserCredentialRepositoryTest {
     public void findAllByIdFailTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
         userCredential.getUser().setActive(false);
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
         entityManager.persist(userCredential);
         entityManager.flush();
@@ -206,20 +212,43 @@ public class UserCredentialRepositoryTest {
 
         Set<UserCredential> readUserCredentialSet = userCredentialRepository.findAllById(Collections.singletonList(1L));
 
-        Assertions.assertEquals(0, readUserCredentialSet.size());
+        assertEquals(0, readUserCredentialSet.size());
     }
 
     @Test
-    public void existsByEmailTest(){
+    public void existsByEmailTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
-        Assertions.assertNull(userCredential.getId());
+        assertNull(userCredential.getId());
 
-        Assertions.assertFalse(userCredentialRepository.existsByEmail(userCredential.getEmail()));
+        assertFalse(userCredentialRepository.existsByEmail(userCredential.getEmail()));
 
         entityManager.persist(userCredential);
         entityManager.flush();
         entityManager.detach(userCredential);
 
-        Assertions.assertTrue(userCredentialRepository.existsByEmail(userCredential.getEmail()));
+        assertTrue(userCredentialRepository.existsByEmail(userCredential.getEmail()));
+    }
+
+    @Test
+    public void findByEmailTest() {
+        UserCredential userCredential = ObjectCreator.createUserCredential();
+        assertNull(userCredential.getId());
+
+        entityManager.persist(userCredential);
+        entityManager.flush();
+        entityManager.detach(userCredential);
+
+        UserCredential credential = userCredentialRepository.findByEmail(userCredential.getEmail()).orElse(null);
+        assertNotNull(credential);
+        entityManager.detach(credential);
+        assertEquals(userCredential.getEmail(), credential.getEmail());
+        assertEquals(userCredential.getRoles().size(), credential.getRoles().size());
+        assertEquals(userCredential.getLocks(), credential.getLocks());
+    }
+
+    @Test
+    public void findByEmailFailTest() {
+        Optional<UserCredential> userCredential = userCredentialRepository.findByEmail("soneEmail@gmail.com");
+        assertNull(userCredential.orElse(null));
     }
 }

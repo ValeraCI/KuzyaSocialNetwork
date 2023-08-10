@@ -147,7 +147,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: password
-                  type: varchar(50)
+                  type: varchar(200)
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:

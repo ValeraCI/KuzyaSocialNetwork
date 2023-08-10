@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "locks")
 public class Lock extends IdEntity<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(columnDefinition = "user_id")
+    @JoinColumn(name = "user_id")
     private UserCredential userCredential;
     @Column(name = "beginning")
     private LocalDateTime beginning;
