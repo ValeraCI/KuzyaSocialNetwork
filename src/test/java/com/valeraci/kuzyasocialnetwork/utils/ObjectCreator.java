@@ -1,5 +1,6 @@
 package com.valeraci.kuzyasocialnetwork.utils;
 
+import com.valeraci.kuzyasocialnetwork.dto.users.LoginDto;
 import com.valeraci.kuzyasocialnetwork.dto.users.RegistrationDto;
 import com.valeraci.kuzyasocialnetwork.models.Comment;
 import com.valeraci.kuzyasocialnetwork.models.FamilyStatus;
@@ -49,7 +50,7 @@ public class ObjectCreator {
 
     public static UserCredential createUserCredential() {
         UserCredential userCredential = new UserCredential();
-        userCredential.setEmail("TestEmail");
+        userCredential.setEmail("TestEmail@gmail.com");
         userCredential.setPassword("TestPassword");
 
         Role role = simpleRoleFactory.createRole(RoleTitle.ROLE_USER);
@@ -61,6 +62,8 @@ public class ObjectCreator {
         User user = createUser();
 
         userCredential.setUser(user);
+
+        userCredential.setLocks(new HashSet<>());
 
         return userCredential;
     }
@@ -175,7 +178,7 @@ public class ObjectCreator {
         return comment;
     }
 
-    public static RegistrationDto createRegistrationDto(){
+    public static RegistrationDto createRegistrationDto() {
         RegistrationDto registrationDto = new RegistrationDto();
         registrationDto.setEmail("email@gmail.com");
         registrationDto.setPassword("passsssss");
@@ -188,7 +191,7 @@ public class ObjectCreator {
 
     public static RegistrationDto createRegistrationDto(String email, String password,
                                                         String lastName, String firstName,
-                                                        FamilyStatusTitle familyStatus){
+                                                        FamilyStatusTitle familyStatus) {
         RegistrationDto registrationDto = new RegistrationDto();
         registrationDto.setEmail(email);
         registrationDto.setPassword(password);
@@ -197,5 +200,13 @@ public class ObjectCreator {
         registrationDto.setFamilyStatusTitle(familyStatus);
 
         return registrationDto;
+    }
+
+    public static LoginDto createLoginDto() {
+        return new LoginDto("testEmail@gmail.com", "password");
+    }
+
+    public static LoginDto createLoginDto(String email, String password) {
+        return new LoginDto(email, password);
     }
 }

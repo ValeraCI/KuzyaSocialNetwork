@@ -4,10 +4,10 @@ import com.valeraci.kuzyasocialnetwork.models.Post;
 import com.valeraci.kuzyasocialnetwork.models.User;
 import com.valeraci.kuzyasocialnetwork.models.baseEntity.IdEntity;
 import com.valeraci.kuzyasocialnetwork.models.enums.FileTypeTitle;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +15,18 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("repositoryTest")
@@ -42,7 +47,7 @@ public class PostRepositoryTest {
     @Test
     public void saveTest() {
         Post post = ObjectCreator.createPostWithMediaFiles(user);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         post = postRepository.save(post);
         entityManager.flush();
@@ -50,9 +55,9 @@ public class PostRepositoryTest {
 
         Post readPost = entityManager.find(Post.class, post.getId());
 
-        Assertions.assertNotNull(readPost);
-        Assertions.assertEquals(post.getTitle(), readPost.getTitle());
-        Assertions.assertEquals(post.getMediaFiles().iterator().next().getPath(),
+        assertNotNull(readPost);
+        assertEquals(post.getTitle(), readPost.getTitle());
+        assertEquals(post.getMediaFiles().iterator().next().getPath(),
                 readPost.getMediaFiles().iterator().next().getPath());
     }
 
@@ -81,13 +86,13 @@ public class PostRepositoryTest {
 
         List<Post> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        Assertions.assertEquals(postSet.size(), readlist.size());
+        assertEquals(postSet.size(), readlist.size());
     }
 
     @Test
     public void findByIdTest() {
         Post post = ObjectCreator.createPostWithMediaFiles(user);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persistAndFlush(post);
         entityManager.detach(post);
@@ -95,10 +100,10 @@ public class PostRepositoryTest {
         Post readPost = postRepository.findById(post.getId()).orElse(null);
         entityManager.detach(readPost);
 
-        Assertions.assertNotNull(readPost);
-        Assertions.assertEquals(post.getTitle(), readPost.getTitle());
-        Assertions.assertTrue(readPost.isActive());
-        Assertions.assertEquals(FileTypeTitle.MP4,
+        assertNotNull(readPost);
+        assertEquals(post.getTitle(), readPost.getTitle());
+        assertTrue(readPost.isActive());
+        assertEquals(FileTypeTitle.MP4,
                 readPost.getMediaFiles().iterator().next().getFileType().getTitle());
     }
 
@@ -106,7 +111,7 @@ public class PostRepositoryTest {
     public void findByIdFailTest() {
         Post post = ObjectCreator.createPost(user);
         post.setActive(false);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persist(post);
         entityManager.flush();
@@ -114,7 +119,7 @@ public class PostRepositoryTest {
 
         Post readPost = postRepository.findById(post.getId()).orElse(null);
 
-        Assertions.assertNull(readPost);
+        assertNull(readPost);
     }
 
     @Test
@@ -133,10 +138,10 @@ public class PostRepositoryTest {
 
         readPostSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(postSet.size(), readPostSet.size());
-        readPostSet.forEach(post -> Assertions.assertTrue(post.isActive()));
+        assertEquals(postSet.size(), readPostSet.size());
+        readPostSet.forEach(post -> assertTrue(post.isActive()));
         readPostSet
-                .forEach(post -> Assertions.assertEquals(FileTypeTitle.MP4,
+                .forEach(post -> assertEquals(FileTypeTitle.MP4,
                         post.getMediaFiles().iterator().next().getFileType().getTitle()));
     }
 
@@ -144,7 +149,7 @@ public class PostRepositoryTest {
     public void findAllFailTest() {
         Post post = ObjectCreator.createPost(user);
         post.setActive(false);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persist(post);
         entityManager.flush();
@@ -152,7 +157,7 @@ public class PostRepositoryTest {
 
         Set<Post> readPostSet = postRepository.findAll();
 
-        Assertions.assertEquals(0, readPostSet.size());
+        assertEquals(0, readPostSet.size());
     }
 
     @Test
@@ -177,10 +182,10 @@ public class PostRepositoryTest {
 
         readPostSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(postSet.size(), readPostSet.size());
-        readPostSet.forEach(post -> Assertions.assertTrue(post.isActive()));
+        assertEquals(postSet.size(), readPostSet.size());
+        readPostSet.forEach(post -> assertTrue(post.isActive()));
         readPostSet
-                .forEach(post -> Assertions.assertEquals(FileTypeTitle.MP4,
+                .forEach(post -> assertEquals(FileTypeTitle.MP4,
                         post.getMediaFiles().iterator().next().getFileType().getTitle()));
     }
 
@@ -188,7 +193,7 @@ public class PostRepositoryTest {
     public void findAllByIdFailTest() {
         Post post = ObjectCreator.createPost(user);
         post.setActive(false);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persist(post);
         entityManager.flush();
@@ -196,13 +201,13 @@ public class PostRepositoryTest {
 
         Set<Post> readPostSet = postRepository.findAllById(Collections.singletonList(1L));
 
-        Assertions.assertEquals(0, readPostSet.size());
+        assertEquals(0, readPostSet.size());
     }
 
     @Test
     public void deleteByIdTest() {
         Post post = ObjectCreator.createPost(user);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persistAndFlush(post);
         entityManager.detach(post);
@@ -211,13 +216,13 @@ public class PostRepositoryTest {
 
         Post readPost = entityManager.find(Post.class, post.getId());
 
-        Assertions.assertFalse(readPost.isActive());
+        assertFalse(readPost.isActive());
     }
 
     @Test
     public void deleteTest() {
         Post post = ObjectCreator.createPost(user);
-        Assertions.assertNull(post.getId());
+        assertNull(post.getId());
 
         entityManager.persistAndFlush(post);
         entityManager.detach(post);
@@ -226,7 +231,7 @@ public class PostRepositoryTest {
 
         Post readPost = entityManager.find(Post.class, post.getId());
 
-        Assertions.assertFalse(readPost.isActive());
+        assertFalse(readPost.isActive());
     }
 
     @Test
@@ -259,6 +264,6 @@ public class PostRepositoryTest {
 
         List<Post> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        readlist.forEach(post -> Assertions.assertFalse(post.isActive()));
+        readlist.forEach(post -> assertFalse(post.isActive()));
     }
 }

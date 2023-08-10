@@ -3,23 +3,28 @@ package com.valeraci.kuzyasocialnetwork.repositories;
 import com.valeraci.kuzyasocialnetwork.models.User;
 import com.valeraci.kuzyasocialnetwork.models.baseEntity.IdEntity;
 import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
+import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("repositoryTest")
@@ -34,7 +39,7 @@ public class UserRepositoryTest {
     @Test
     public void findByIdTest() {
         User user = ObjectCreator.createUser();
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persistAndFlush(user);
         entityManager.detach(user);
@@ -42,17 +47,17 @@ public class UserRepositoryTest {
         User readUser = userRepository.findById(user.getId()).orElse(null);
         entityManager.detach(readUser);
 
-        Assertions.assertNotNull(readUser);
-        Assertions.assertEquals(user.getLastName(), readUser.getLastName());
-        Assertions.assertTrue(readUser.isActive());
-        Assertions.assertEquals(FamilyStatusTitle.SINGLE, readUser.getFamilyStatus().getTitle());
+        assertNotNull(readUser);
+        assertEquals(user.getLastName(), readUser.getLastName());
+        assertTrue(readUser.isActive());
+        assertEquals(FamilyStatusTitle.SINGLE, readUser.getFamilyStatus().getTitle());
     }
 
     @Test
     public void findByIdFailTest() {
         User user = ObjectCreator.createUser();
         user.setActive(false);
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persist(user);
         entityManager.flush();
@@ -60,7 +65,7 @@ public class UserRepositoryTest {
 
         User readUser = userRepository.findById(user.getId()).orElse(null);
 
-        Assertions.assertNull(readUser);
+        assertNull(readUser);
     }
 
     @Test
@@ -80,17 +85,17 @@ public class UserRepositoryTest {
 
         readUserSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(userSet.size(), readUserSet.size());
-        readUserSet.forEach(user -> Assertions.assertTrue(user.isActive()));
+        assertEquals(userSet.size(), readUserSet.size());
+        readUserSet.forEach(user -> assertTrue(user.isActive()));
         readUserSet
-                .forEach(user -> Assertions.assertEquals(FamilyStatusTitle.SINGLE, user.getFamilyStatus().getTitle()));
+                .forEach(user -> assertEquals(FamilyStatusTitle.SINGLE, user.getFamilyStatus().getTitle()));
     }
 
     @Test
     public void findAllFailTest() {
         User user = ObjectCreator.createUser();
         user.setActive(false);
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persist(user);
         entityManager.flush();
@@ -98,7 +103,7 @@ public class UserRepositoryTest {
 
         Set<User> readUserSet = userRepository.findAll();
 
-        Assertions.assertEquals(0, readUserSet.size());
+        assertEquals(0, readUserSet.size());
     }
 
     @Test
@@ -124,17 +129,17 @@ public class UserRepositoryTest {
 
         readUserSet.forEach(entityManager::detach);
 
-        Assertions.assertEquals(userSet.size(), readUserSet.size());
-        readUserSet.forEach(user -> Assertions.assertTrue(user.isActive()));
+        assertEquals(userSet.size(), readUserSet.size());
+        readUserSet.forEach(user -> assertTrue(user.isActive()));
         readUserSet
-                .forEach(user -> Assertions.assertEquals(FamilyStatusTitle.SINGLE, user.getFamilyStatus().getTitle()));
+                .forEach(user -> assertEquals(FamilyStatusTitle.SINGLE, user.getFamilyStatus().getTitle()));
     }
 
     @Test
     public void findAllByIdFailTest() {
         User user = ObjectCreator.createUser();
         user.setActive(false);
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persist(user);
         entityManager.flush();
@@ -142,13 +147,13 @@ public class UserRepositoryTest {
 
         Set<User> readUserSet = userRepository.findAllById(Collections.singletonList(1L));
 
-        Assertions.assertEquals(0, readUserSet.size());
+        assertEquals(0, readUserSet.size());
     }
 
     @Test
     public void deleteByIdTest() {
         User user = ObjectCreator.createUser();
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persistAndFlush(user);
         entityManager.detach(user);
@@ -157,13 +162,13 @@ public class UserRepositoryTest {
 
         User readUser = entityManager.find(User.class, user.getId());
 
-        Assertions.assertFalse(readUser.isActive());
+        assertFalse(readUser.isActive());
     }
 
     @Test
     public void deleteTest() {
         User user = ObjectCreator.createUser();
-        Assertions.assertNull(user.getId());
+        assertNull(user.getId());
 
         entityManager.persistAndFlush(user);
         entityManager.detach(user);
@@ -172,7 +177,7 @@ public class UserRepositoryTest {
 
         User readUser = entityManager.find(User.class, user.getId());
 
-        Assertions.assertFalse(readUser.isActive());
+        assertFalse(readUser.isActive());
     }
 
     @Test
@@ -206,6 +211,6 @@ public class UserRepositoryTest {
 
         List<User> readlist = entityManager.getEntityManager().createQuery(query).getResultList();
 
-        readlist.forEach(user -> Assertions.assertFalse(user.isActive()));
+        readlist.forEach(user -> assertFalse(user.isActive()));
     }
 }
