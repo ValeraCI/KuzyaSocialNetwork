@@ -30,7 +30,7 @@ public class UserDetailsServiceImplTest {
     public void loadUserByUsernameTest() {
         UserCredential userCredential = ObjectCreator.createUserCredential();
         Optional<UserCredential> optionalUserCredential = Optional.of(userCredential);
-        when(repository.findByEmail(anyString())).thenReturn(optionalUserCredential);
+        when(repository.findWithLocksAndRolesByEmail(anyString())).thenReturn(optionalUserCredential);
 
         UserDetails accountDetails = userDetailsServiceImpl.loadUserByUsername("");
 
@@ -41,7 +41,7 @@ public class UserDetailsServiceImplTest {
     @Test
     public void loadUserByUsernameFailTest() {
         Optional<UserCredential> optionalUserCredential = Optional.empty();
-        when(repository.findByEmail(anyString())).thenReturn(optionalUserCredential);
+        when(repository.findWithLocksAndRolesByEmail(anyString())).thenReturn(optionalUserCredential);
 
         assertThrows(
                 UsernameNotFoundException.class, () -> userDetailsServiceImpl.loadUserByUsername("")

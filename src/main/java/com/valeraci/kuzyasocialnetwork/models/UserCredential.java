@@ -15,6 +15,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Getter
@@ -44,4 +46,16 @@ public class UserCredential {
     @OneToOne(cascade = CascadeType.PERSIST)
     @MapsId
     private User user;
+
+    public Optional<Lock> getActiveLock(){
+        LocalDateTime now = LocalDateTime.now();
+        return locks
+                .stream()
+                .filter(lock -> lock.getEnding().isAfter(now))
+                .findAny();
+    }
+
+    public boolean hasActiveLock(){
+        return getActiveLock().isPresent();
+    }
 }

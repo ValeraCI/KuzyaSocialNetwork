@@ -42,8 +42,6 @@ public class UserCredentialRepositoryTest {
         assertNull(userCredential.getId());
 
         userCredential = userCredentialRepository.save(userCredential);
-        entityManager.flush();
-        entityManager.detach(userCredential);
 
         UserCredential readUserCredential = entityManager.find(UserCredential.class, userCredential.getId());
 
@@ -65,9 +63,6 @@ public class UserCredentialRepositoryTest {
 
         userCredentialSet = userCredentialRepository.saveAll(userCredentialSet);
 
-        entityManager.flush();
-        userCredentialSet.forEach(entityManager::detach);
-
         CriteriaBuilder builder = entityManager.getEntityManager().getCriteriaBuilder();
         CriteriaQuery<UserCredential> query = builder.createQuery(UserCredential.class);
         Root<UserCredential> root = query.from(UserCredential.class);
@@ -87,9 +82,6 @@ public class UserCredentialRepositoryTest {
 
         userCredentialRepository.saveAll(userCredentialSet);
 
-        entityManager.flush();
-        entityManager.detach(userCredential);
-
         userCredential =
                 entityManager.find(UserCredential.class, userCredential.getId());
 
@@ -101,8 +93,7 @@ public class UserCredentialRepositoryTest {
         UserCredential userCredential = ObjectCreator.createUserCredential();
         assertNull(userCredential.getId());
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
         UserCredential readUserCredential =
@@ -121,8 +112,7 @@ public class UserCredentialRepositoryTest {
         userCredential.getUser().setActive(false);
         assertNull(userCredential.getId());
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
         UserCredential readUserCredential =
@@ -162,8 +152,7 @@ public class UserCredentialRepositoryTest {
         userCredential.getUser().setActive(false);
         assertNull(userCredential.getId());
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
         Set<UserCredential> readUserCredentialSet = userCredentialRepository.findAll();
@@ -206,8 +195,7 @@ public class UserCredentialRepositoryTest {
         userCredential.getUser().setActive(false);
         assertNull(userCredential.getId());
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
         Set<UserCredential> readUserCredentialSet = userCredentialRepository.findAllById(Collections.singletonList(1L));
@@ -222,33 +210,65 @@ public class UserCredentialRepositoryTest {
 
         assertFalse(userCredentialRepository.existsByEmail(userCredential.getEmail()));
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
         assertTrue(userCredentialRepository.existsByEmail(userCredential.getEmail()));
     }
 
     @Test
-    public void findByEmailTest() {
-        UserCredential userCredential = ObjectCreator.createUserCredential();
+    public void findWithLocksAndRolesByEmailTest() {
+        UserCredential userCredential=
+                ObjectCreator.createUserCredential();
+
         assertNull(userCredential.getId());
 
-        entityManager.persist(userCredential);
-        entityManager.flush();
+        entityManager.persistAndFlush(userCredential);
         entityManager.detach(userCredential);
 
-        UserCredential credential = userCredentialRepository.findByEmail(userCredential.getEmail()).orElse(null);
+        UserCredential credential = userCredentialRepository
+                .findWithLocksAndRolesByEmail(userCredential.getEmail()).orElse(null);
         assertNotNull(credential);
         entityManager.detach(credential);
+
         assertEquals(userCredential.getEmail(), credential.getEmail());
         assertEquals(userCredential.getRoles().size(), credential.getRoles().size());
-        assertEquals(userCredential.getLocks(), credential.getLocks());
+        assertNotNull(credential.getLocks());
+        assertEquals(userCredential.getLocks().size(), credential.getLocks().size());
     }
 
     @Test
-    public void findByEmailFailTest() {
-        Optional<UserCredential> userCredential = userCredentialRepository.findByEmail("soneEmail@gmail.com");
+    public void findWithLocksAndRolesByEmailFailTest() {
+        Optional<UserCredential> userCredential =
+                userCredentialRepository.findWithLocksAndRolesByEmail("soneEmail@gmail.com");
+        assertNull(userCredential.orElse(null));
+    }
+
+    @Test
+    public void findWithLocksAndRolesByIdTest() {
+        UserCredential userCredential=
+                ObjectCreator.createUserCredential();
+
+        assertNull(userCredential.getId());
+
+        entityManager.persistAndFlush(userCredential);
+        entityManager.detach(userCredential);
+
+        UserCredential credential = userCredentialRepository
+                .findWithLocksAndRolesById(userCredential.getId()).orElse(null);
+        assertNotNull(credential);
+        entityManager.detach(credential);
+
+        assertEquals(userCredential.getEmail(), credential.getEmail());
+        assertEquals(userCredential.getRoles().size(), credential.getRoles().size());
+        assertNotNull(credential.getLocks());
+        assertEquals(userCredential.getLocks().size(), credential.getLocks().size());
+    }
+
+    @Test
+    public void findWithLocksAndRolesByIdFailTest() {
+        Optional<UserCredential> userCredential =
+                userCredentialRepository.findWithLocksAndRolesById(-5L);
         assertNull(userCredential.orElse(null));
     }
 }

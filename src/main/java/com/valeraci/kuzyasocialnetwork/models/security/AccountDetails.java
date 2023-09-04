@@ -1,6 +1,7 @@
 package com.valeraci.kuzyasocialnetwork.models.security;
 
 import com.valeraci.kuzyasocialnetwork.models.UserCredential;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 @RequiredArgsConstructor
+@Getter
 public class AccountDetails implements UserDetails {
 
     private final UserCredential userCredential;
@@ -43,7 +45,8 @@ public class AccountDetails implements UserDetails {
         LocalDateTime now = LocalDateTime.now();
 
         return userCredential.getLocks()
-                .stream().noneMatch(lock -> lock.getBeginning().plusDays(lock.getDays()).isAfter(now));
+                .stream()
+                .noneMatch(lock -> lock.getEnding().isAfter(now));
     }
 
     @Override
