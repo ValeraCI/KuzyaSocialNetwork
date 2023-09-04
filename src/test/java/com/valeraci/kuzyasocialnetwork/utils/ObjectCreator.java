@@ -5,6 +5,7 @@ import com.valeraci.kuzyasocialnetwork.dto.users.RegistrationDto;
 import com.valeraci.kuzyasocialnetwork.models.Comment;
 import com.valeraci.kuzyasocialnetwork.models.FamilyStatus;
 import com.valeraci.kuzyasocialnetwork.models.FileType;
+import com.valeraci.kuzyasocialnetwork.models.Lock;
 import com.valeraci.kuzyasocialnetwork.models.MediaFile;
 import com.valeraci.kuzyasocialnetwork.models.Post;
 import com.valeraci.kuzyasocialnetwork.models.Role;
@@ -16,6 +17,7 @@ import com.valeraci.kuzyasocialnetwork.models.enums.RoleTitle;
 import com.valeraci.kuzyasocialnetwork.util.factories.SimpleFamilyStatusFactory;
 import com.valeraci.kuzyasocialnetwork.util.factories.SimpleRoleFactory;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -84,6 +86,30 @@ public class ObjectCreator {
         User user = createUser(lastName, firstName, familyStatusTitle);
 
         userCredential.setUser(user);
+
+        return userCredential;
+    }
+
+    public static UserCredential createUserCredential(String email, String password,
+                                                      String lastName, String firstName,
+                                                      FamilyStatusTitle familyStatusTitle,
+                                                      RoleTitle roleTitle) {
+        UserCredential userCredential = new UserCredential();
+        userCredential.setEmail(email);
+        userCredential.setPassword(password);
+
+        Role role = simpleRoleFactory.createRole(roleTitle);
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(role);
+
+        userCredential.setRoles(roleSet);
+
+        User user = createUser(lastName, firstName, familyStatusTitle);
+
+        userCredential.setUser(user);
+
+        userCredential.setLocks(new HashSet<>());
+
 
         return userCredential;
     }
@@ -208,5 +234,15 @@ public class ObjectCreator {
 
     public static LoginDto createLoginDto(String email, String password) {
         return new LoginDto(email, password);
+    }
+
+    public static Lock createLock(){
+        Lock lock = new Lock();
+        lock.setBeginning(LocalDateTime.now());
+        lock.setDays(1);
+        lock.setReason("test");
+        lock.setUserCredential(createUserCredential());
+
+        return lock;
     }
 }

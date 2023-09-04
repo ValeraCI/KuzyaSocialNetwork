@@ -25,6 +25,10 @@ public interface UserCredentialRepository extends org.springframework.data.repos
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM UserCredential u WHERE u.email = :email")
     boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM UserCredential u LEFT JOIN FETCH u.locks LEFT JOIN FETCH u.roles LEFT JOIN u.user us WHERE u.email = :email AND us.isActive")
-    Optional<UserCredential> findByEmail(String email);
+    @Query("SELECT u FROM UserCredential u LEFT JOIN FETCH u.locks LEFT JOIN FETCH u.roles JOIN u.user us " +
+            "WHERE u.email = :email AND us.isActive")
+    Optional<UserCredential> findWithLocksAndRolesByEmail(String email);
+    @Query("SELECT u FROM UserCredential u LEFT JOIN FETCH u.locks LEFT JOIN FETCH u.roles JOIN u.user us " +
+            "WHERE u.id = :id AND us.isActive")
+    Optional<UserCredential> findWithLocksAndRolesById(Long id);
 }
