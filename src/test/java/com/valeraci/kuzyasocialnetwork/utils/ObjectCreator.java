@@ -90,30 +90,6 @@ public class ObjectCreator {
         return userCredential;
     }
 
-    public static UserCredential createUserCredential(String email, String password,
-                                                      String lastName, String firstName,
-                                                      FamilyStatusTitle familyStatusTitle,
-                                                      RoleTitle roleTitle) {
-        UserCredential userCredential = new UserCredential();
-        userCredential.setEmail(email);
-        userCredential.setPassword(password);
-
-        Role role = simpleRoleFactory.createRole(roleTitle);
-        Set<Role> roleSet = new HashSet<>();
-        roleSet.add(role);
-
-        userCredential.setRoles(roleSet);
-
-        User user = createUser(lastName, firstName, familyStatusTitle);
-
-        userCredential.setUser(user);
-
-        userCredential.setLocks(new HashSet<>());
-
-
-        return userCredential;
-    }
-
     public static Post createPost(User user) {
         Post post = new Post();
         post.setUser(user);
@@ -206,7 +182,7 @@ public class ObjectCreator {
 
     public static RegistrationDto createRegistrationDto() {
         RegistrationDto registrationDto = new RegistrationDto();
-        registrationDto.setEmail("email@gmail.com");
+        registrationDto.setEmail("testEmail@gmail.com");
         registrationDto.setPassword("passsssss");
         registrationDto.setLastName("lntest");
         registrationDto.setFirstName("fntest");

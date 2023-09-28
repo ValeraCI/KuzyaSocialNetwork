@@ -3,14 +3,11 @@ package com.valeraci.kuzyasocialnetwork.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valeraci.kuzyasocialnetwork.dto.users.LoginDto;
 import com.valeraci.kuzyasocialnetwork.dto.users.RegistrationDto;
-import com.valeraci.kuzyasocialnetwork.models.UserCredential;
 import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
-import com.valeraci.kuzyasocialnetwork.models.enums.RoleTitle;
 import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -32,8 +29,6 @@ public class SecurityControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private TestEntityManager entityManager;
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Test
@@ -48,14 +43,6 @@ public class SecurityControllerTest {
 
     @Test
     public void registerFail() throws Exception {
-        UserCredential userCredentialAdmin =
-                ObjectCreator.createUserCredential("admin@gmail.com",
-                        "$2a$10$RkFea3usuUV27pYUPyCSQOAD.EdZNPN23qkXA3QrnBF6.I/7wCnQK", "Admin",
-                        "Admin", FamilyStatusTitle.SINGLE, RoleTitle.ROLE_ADMINISTRATOR);
-
-        entityManager.persist(userCredentialAdmin);
-        entityManager.flush();
-
         RegistrationDto registrationDto =
                 ObjectCreator.createRegistrationDto("admin@gmail.com", "admin1",
                         "Admin", "Admin", FamilyStatusTitle.SINGLE);
@@ -85,15 +72,6 @@ public class SecurityControllerTest {
 
     @Test
     public void loginTest() throws Exception {
-        UserCredential userCredentialAdmin =
-                ObjectCreator.createUserCredential("admin@gmail.com",
-                        "$2a$10$RkFea3usuUV27pYUPyCSQOAD.EdZNPN23qkXA3QrnBF6.I/7wCnQK", "Admin",
-                        "Admin", FamilyStatusTitle.SINGLE, RoleTitle.ROLE_ADMINISTRATOR);
-
-        entityManager.persist(userCredentialAdmin);
-        entityManager.flush();
-
-
         LoginDto loginDto = ObjectCreator.createLoginDto("admin@gmail.com", "admin1");
         mockMvc.perform(get("/login")
                         .contentType(MediaType.APPLICATION_JSON)

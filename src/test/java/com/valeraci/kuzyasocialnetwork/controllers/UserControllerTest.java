@@ -5,11 +5,11 @@ import com.valeraci.kuzyasocialnetwork.dto.locks.LockDto;
 import com.valeraci.kuzyasocialnetwork.dto.users.LoginDto;
 import com.valeraci.kuzyasocialnetwork.models.Lock;
 import com.valeraci.kuzyasocialnetwork.models.UserCredential;
-import com.valeraci.kuzyasocialnetwork.models.enums.FamilyStatusTitle;
-import com.valeraci.kuzyasocialnetwork.models.enums.RoleTitle;
 import com.valeraci.kuzyasocialnetwork.utils.ObjectCreator;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -25,12 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @AutoConfigureTestEntityManager
 @Transactional
+@TestInstance(value = TestInstance.Lifecycle.PER_CLASS)
 public class UserControllerTest {
 
     @Autowired
@@ -41,29 +43,20 @@ public class UserControllerTest {
     private TestEntityManager entityManager;
     private String token;
 
-    private final UserCredential userCredentialAdmin =
-            ObjectCreator.createUserCredential("admin@gmail.com",
-                    "$2a$10$RkFea3usuUV27pYUPyCSQOAD.EdZNPN23qkXA3QrnBF6.I/7wCnQK", "Admin",
-                    "Admin", FamilyStatusTitle.SINGLE, RoleTitle.ROLE_ADMINISTRATOR);
+    private UserCredential userCredentialAdmin;
 
-    private final UserCredential userCredentialUser =
-            ObjectCreator.createUserCredential("user@gmail.com",
-                    "$2a$10$1doJAftGDeLsphyULJGkRuUx8zyevBerfv5.eDC5qBFN0kuE.7D5a", "User",
-                    "User", FamilyStatusTitle.SINGLE, RoleTitle.ROLE_USER);
+    private UserCredential userCredentialUser;
 
-    @BeforeEach
+
+    @BeforeAll
     public void setup() throws Exception {
-        entityManager.persistAndFlush(userCredentialAdmin);
-        entityManager.persistAndFlush(userCredentialUser);
-
-        entityManager.clear();
-
         String json = objectMapper.writeValueAsString(
                 new LoginDto("admin@gmail.com", "admin1"));
 
         MvcResult result = mockMvc.perform(get("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
+                .andDo(print())
                 .andReturn();
 
         token = "Bearer " + result.getResponse()
@@ -72,6 +65,12 @@ public class UserControllerTest {
                 .replace('\"', ' ')
                 .replace('}', ' ')
                 .trim();
+    }
+
+    @BeforeEach
+    public void readUsers(){
+        userCredentialAdmin = entityManager.find(UserCredential.class, 1L);
+        userCredentialUser = entityManager.find(UserCredential.class, 2L);
     }
 
     @Test
@@ -83,6 +82,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(400, result.getResponse().getStatus());
@@ -97,6 +97,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(403, result.getResponse().getStatus());
@@ -112,11 +113,11 @@ public class UserControllerTest {
         String json = objectMapper.writeValueAsString(
                 new LockDto(1, "testReason"));
 
-        MvcResult result = mockMvc.perform(patch("/users/lock/" + userCredentialUser.getUser().getId()
-                )
+        MvcResult result = mockMvc.perform(patch("/users/lock/" + userCredentialUser.getUser().getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(409, result.getResponse().getStatus());
@@ -131,15 +132,31 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(200, result.getResponse().getStatus());
     }
 
     @Test
+    public void lockNoTokenTest() throws Exception {
+        String json = objectMapper.writeValueAsString(
+                new LockDto(1, "testReason"));
+
+        MvcResult result = mockMvc.perform(patch("/users/lock/" + userCredentialUser.getUser().getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andReturn();
+
+        assertEquals(401, result.getResponse().getStatus());
+    }
+
+    @Test
     public void unlockUserNotFoundExceptionTest() throws Exception {
         MvcResult result = mockMvc.perform(delete("/users/lock/-1")
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(400, result.getResponse().getStatus());
@@ -149,6 +166,7 @@ public class UserControllerTest {
     public void unlockUserNotBlockedExceptionTest() throws Exception {
         MvcResult result = mockMvc.perform(delete("/users/lock/" + userCredentialAdmin.getUser().getId())
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(409, result.getResponse().getStatus());
@@ -159,13 +177,29 @@ public class UserControllerTest {
         Lock lock = ObjectCreator.createLock();
 
         lock.setUserCredential(userCredentialUser);
-
+        entityManager.persistAndFlush(userCredentialUser);
         entityManager.persistAndFlush(lock);
 
         MvcResult result = mockMvc.perform(delete("/users/lock/" + userCredentialUser.getUser().getId())
                         .header("Authorization", token))
+                .andDo(print())
                 .andReturn();
 
         assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
+    public void unlockNoTokenTest() throws Exception {
+        Lock lock = ObjectCreator.createLock();
+
+        lock.setUserCredential(userCredentialUser);
+
+        entityManager.persistAndFlush(lock);
+
+        MvcResult result = mockMvc.perform(delete("/users/lock/" + userCredentialUser.getUser().getId()))
+                .andDo(print())
+                .andReturn();
+
+        assertEquals(401, result.getResponse().getStatus());
     }
 }
